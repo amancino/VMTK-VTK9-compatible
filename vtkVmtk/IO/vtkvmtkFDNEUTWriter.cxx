@@ -141,7 +141,8 @@ void vtkvmtkFDNEUTWriter::WriteData()
       }
 
     int fdneutElementType, fdneutElementGeometry, numberOfNodesInElement;
-    vtkIdType npts, *pts, *cellPoints;
+    vtkIdType npts, *cellPoints;
+    vtkIdType const *pts;
     fdneutElementType = -1;
     fdneutElementGeometry = -1;
 

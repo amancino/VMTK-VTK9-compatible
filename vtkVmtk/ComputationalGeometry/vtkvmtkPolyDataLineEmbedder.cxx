@@ -89,8 +89,9 @@ vtkIdType vtkvmtkPolyDataLineEmbedder::GetCellId(vtkPolyData* input, vtkIdList* 
 void vtkvmtkPolyDataLineEmbedder::GetNeighbors(vtkIdType pointId, vtkIdList* neighborPointIds)
 {
   vtkIdType i, j;
-  unsigned short ncells;
-  vtkIdType *cells, npts, *pts;
+  vtkIdType ncells;
+  vtkIdType *cells, npts;
+  vtkIdType const *pts;
 
   this->Lines->GetPointCells(pointId,ncells,cells);
 
@@ -274,7 +275,8 @@ int vtkvmtkPolyDataLineEmbedder::RequestData(
   vtkIdType i, j, k;
   vtkIdType id, lineNumberOfPoints, lineNumberOfCells, cellId;
   vtkIdType inputNumberOfPoints;
-  vtkIdType npts, *pts;
+  vtkIdType npts;
+  vtkIdType const *pts;
   vtkIdType edgePointIds0[2], edgePointIds1[2];
   double pCoord;
   vtkPoints* newPoints;

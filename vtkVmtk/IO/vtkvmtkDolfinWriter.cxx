@@ -59,7 +59,7 @@ void vtkvmtkDolfinWriter::WriteData()
     vtkErrorMacro(<<"FileName not set.");
     return;
     }
-  ofstream out (this->FileName);
+  std::ofstream out (this->FileName);
   if (!out.good())
     {
     vtkErrorMacro(<<"Could not open file for writing.");

@@ -33,6 +33,7 @@ Version:   $Revision: 1.5 $
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkVersion.h"
+#include "vtkIdTypeArray.h"
 
 
 vtkStandardNewMacro(vtkvmtkCapPolyData);

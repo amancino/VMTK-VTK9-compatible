@@ -56,7 +56,8 @@ int vtkvmtkLinearToQuadraticSurfaceMeshFilter::RequestData(
   vtkUnstructuredGrid *input = vtkUnstructuredGrid::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  vtkIdType nqpts, *qpts, npts0, *pts0, npts1, *pts1;
+  vtkIdType nqpts, *qpts, npts0, npts1;
+  vtkIdType const *pts0, *pts1;
   vtkIdType numberOfInputCells;
   vtkPolyData* subdividedSurface;
   vtkCellArray* quadraticTriangles;

@@ -64,8 +64,8 @@ void vtkvmtkTetGenWriter::WriteData()
   std::string eleFileName = this->GetFileName();
   eleFileName += ".ele";
 
-  ofstream nodeStream(nodeFileName.c_str());
-  ofstream eleStream(eleFileName.c_str());
+  std::ofstream nodeStream(nodeFileName.c_str());
+  std::ofstream eleStream(eleFileName.c_str());
  
   if (!nodeStream.good())
     {

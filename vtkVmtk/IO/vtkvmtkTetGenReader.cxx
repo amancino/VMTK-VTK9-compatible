@@ -96,8 +96,8 @@ int vtkvmtkTetGenReader::RequestData(
   std::string eleFileName = this->GetFileName();
   eleFileName += ".ele";
 
-  ifstream nodeStream(nodeFileName.c_str());
-  ifstream eleStream(eleFileName.c_str());
+  std::ifstream nodeStream(nodeFileName.c_str());
+  std::ifstream eleStream(eleFileName.c_str());
 
   if (!nodeStream.good())
     {

@@ -184,7 +184,7 @@ int vtkvmtkLinearizeMeshFilter::RequestData(
   int numberOfOutputCells = outputCellArray->GetNumberOfCells();
   outputCellArray->InitTraversal();
   vtkIdType npts = 0;
-  vtkIdType *pts = NULL;
+  vtkIdType const *pts = NULL;
   for (i=0; i<numberOfOutputCells; i++)
     {
     outputCellArray->GetNextCell(npts,pts);

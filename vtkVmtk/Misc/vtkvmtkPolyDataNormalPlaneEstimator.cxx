@@ -114,8 +114,9 @@ int vtkvmtkPolyDataNormalPlaneEstimator::RequestData(
     connectivityFilter->Delete();
   }
 
-  vtkIdType npts, *pts, *cells;
-  unsigned short ncells;
+  vtkIdType npts, *cells;
+  vtkIdType const *pts;
+  vtkIdType ncells;
 
   input->GetPointCells(this->OriginPointId,ncells,cells);
 

@@ -117,7 +117,7 @@ void vtkvmtkFluentWriter::WriteData()
     return;
     }
         
-  ofstream out (this->GetFileName());
+  std::ofstream out (this->GetFileName());
 
   if (!out.good())
     {

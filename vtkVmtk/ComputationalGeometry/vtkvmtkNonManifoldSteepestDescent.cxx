@@ -54,7 +54,8 @@ double vtkvmtkNonManifoldSteepestDescent::GetSteepestDescentInCell(vtkPolyData* 
   double scalar0, scalar1, scalar;
   double currentS;
   double directionFactor = 0.0;
-  vtkIdType npts, *pts;
+  vtkIdType npts;
+  vtkIdType const *pts;
   vtkIdType i, j;
 
   if (!this->DescentArray)

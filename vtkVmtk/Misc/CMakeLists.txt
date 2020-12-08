@@ -1,18 +1,17 @@
 set(VTK_VMTK_MISC_TARGET_LINK_LIBRARIES vtkvmtkComputationalGeometry vtkvmtkDifferentialGeometry)
 
 set( VTK_VMTK_MISC_COMPONENTS
-vtkFiltersFlowPaths
-vtkFiltersGeometry
-vtkFiltersModeling
-vtkImagingCore
+FiltersFlowPaths
+FiltersGeometry
+FiltersModeling
+ImagingCore
 )
 if (VTK_WRAP_PYTHON AND VTK_VMTK_WRAP_PYTHON)
 list(APPEND VTK_VMTK_MISC_COMPONENTS
-  vtkWrappingPythonCore
+  WrappingPythonCore
   )
 endif(VTK_WRAP_PYTHON AND VTK_VMTK_WRAP_PYTHON)
 find_package( VTK ${VTK_VERSION_MAJOR}.${VTK_VERSION_MINOR} COMPONENTS ${VTK_VMTK_MISC_COMPONENTS} REQUIRED )
-include( ${VTK_USE_FILE} )
 list( APPEND VTK_VMTK_MISC_TARGET_LINK_LIBRARIES ${VTK_LIBRARIES} )
 
 set (VTK_VMTK_MISC_SRCS

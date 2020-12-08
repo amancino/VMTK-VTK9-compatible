@@ -71,7 +71,8 @@ double vtkvmtkPolyBallLine::ComplexDot(double x[4], double y[4])
 double vtkvmtkPolyBallLine::EvaluateFunction(double x[3])
 {
   vtkIdType i, k;
-  vtkIdType npts, *pts;
+  vtkIdType npts;
+  vtkIdType const *pts;
   double polyballFunctionValue, minPolyBallFunctionValue;
   double point0[3], point1[3];
   double radius0, radius1;

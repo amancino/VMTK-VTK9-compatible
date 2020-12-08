@@ -35,7 +35,7 @@ Version:   $Revision: 1.6 $
 #include "vtkMath.h"
 #include "vtkTriangle.h"
 #include "vtkVersion.h"
-
+#include "vtkIdTypeArray.h"
 
 vtkStandardNewMacro(vtkvmtkSmoothCapPolyData);
 

@@ -34,7 +34,7 @@ Version:   $Revision: 1.4 $
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkVersion.h"
-
+#include "vtkIdTypeArray.h"
 
 vtkStandardNewMacro(vtkvmtkMergeCenterlines);
 
@@ -416,7 +416,8 @@ int vtkvmtkMergeCenterlines::RequestData(vtkInformation *vtkNotUsed(request), vt
   outputLines->InitTraversal();
   for (i=0; i<numberOfMergedCells; i++)
     {
-    vtkIdType npts, *pts;
+    vtkIdType npts;
+    vtkIdType const *pts;
     npts = 0;
     pts = NULL;
     outputLines->GetNextCell(npts,pts);

@@ -184,9 +184,10 @@ void vtkvmtkBoundaryReferenceSystems::OrientBoundaryNormalOutwards(vtkPolyData* 
   surface->BuildCells();
   surface->BuildLinks();
 
-  unsigned short ncells;
+  vtkIdType ncells;
   vtkIdType *cells;
-  vtkIdType npts, *pts;
+  vtkIdType npts;
+  vtkIdType const *pts;
 
   double boundaryPoint[3], neighborPoint[3];
 
@@ -202,10 +203,10 @@ void vtkvmtkBoundaryReferenceSystems::OrientBoundaryNormalOutwards(vtkPolyData* 
   double neighborsToBoundaryNormal[3];
   neighborsToBoundaryNormal[0] = neighborsToBoundaryNormal[1] = neighborsToBoundaryNormal[2] = 0.0;
   for (j=0; j<numberOfBoundaryPoints; j++)
-    {
+  {
     surface->GetPointCells(boundaryIds->GetId(j),ncells,cells);
     for (int c=0; c<ncells; c++)
-      {
+    {
       surface->GetCellPoints(cells[c],npts,pts);
       for (int p=0; p<npts; p++)
         {

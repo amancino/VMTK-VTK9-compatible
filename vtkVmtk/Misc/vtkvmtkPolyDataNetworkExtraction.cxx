@@ -146,7 +146,8 @@ void vtkvmtkPolyDataNetworkExtraction::BoundarySeparator(vtkPolyData* appendedBo
     {
     vtkPoints* boundaryPoints = vtkPoints::New();
     vtkCellArray* boundaryCellArray = vtkCellArray::New();
-    vtkIdType npts, *pts;
+    vtkIdType npts;
+    vtkIdType const *pts;
     appendedBoundaries->GetCellPoints(i,npts,pts);
     boundaryCellArray->InsertNextCell(npts+1);
     vtkIdType j;
@@ -407,9 +408,9 @@ void vtkvmtkPolyDataNetworkExtraction::InsertEdgeForNewProfiles(vtkPolyData* mod
 {
   if (this->InsertUniqueInEdgeTable(edgeTable,edge[0],edge[1]))
     {
-    unsigned short ncells0; vtkIdType *cell0;
+    vtkIdType ncells0; vtkIdType *cell0;
     model->GetPointCells(edge[0],ncells0,cell0);
-    unsigned short ncells1; vtkIdType *cell1;
+    vtkIdType ncells1; vtkIdType *cell1;
     model->GetPointCells(edge[1],ncells1,cell1);
 
     vtkIdType cellPair[2];
@@ -448,12 +449,13 @@ bool vtkvmtkPolyDataNetworkExtraction::LookForNeighbors(vtkPolyData* model, vtkI
 
   bool someNeighborsFound = false;
   // return non visited neighbors, and true if there are any, false otherwise
-  unsigned short ncells; vtkIdType *cell;
+  vtkIdType ncells; vtkIdType *cell;
   model->GetPointCells(pointId,ncells,cell);
   vtkIdType i;
   for (i=0; i<ncells; i++)
     {
-    vtkIdType npts; vtkIdType* pts;
+    vtkIdType npts;
+    vtkIdType const *pts;
     model->GetCellPoints(cell[i],npts,pts);
     vtkIdType j;
     for (j=0; j<npts; j++)

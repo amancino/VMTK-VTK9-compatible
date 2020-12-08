@@ -40,6 +40,7 @@ Version:   $Revision: 1.0 $
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkVersion.h"
+#include "vtkIdTypeArray.h"
 
 #include <limits>
 
