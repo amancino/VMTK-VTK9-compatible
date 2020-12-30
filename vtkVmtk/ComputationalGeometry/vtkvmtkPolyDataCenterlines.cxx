@@ -144,19 +144,16 @@ vtkvmtkPolyDataCenterlines::~vtkvmtkPolyDataCenterlines()
 
   if (this->DelaunayTessellation)
     {
-    this->DelaunayTessellation->Delete();
     this->DelaunayTessellation = NULL;
     }
 
   if (this->VoronoiDiagram)
   {
-    this->VoronoiDiagram->Delete();
     this->VoronoiDiagram = NULL;
   }
 
   if (this->PoleIds)
   {
-    this->PoleIds->Delete();
     this->PoleIds = NULL;
   }
 
@@ -211,7 +208,7 @@ int vtkvmtkPolyDataCenterlines::RequestData(
     return 1;
   }
 
-  vtkPolyDataNormals* surfaceNormals = vtkPolyDataNormals::New();
+  auto surfaceNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
   #if (VTK_MAJOR_VERSION <= 5)
     surfaceNormals->SetInput(input);
   #else
@@ -226,7 +223,7 @@ int vtkvmtkPolyDataCenterlines::RequestData(
 
   if (this->GenerateDelaunayTessellation)
   {
-    vtkDelaunay3D* delaunayTessellator = vtkDelaunay3D::New();
+    auto delaunayTessellator = vtkSmartPointer<vtkDelaunay3D>::New();
     delaunayTessellator->CreateDefaultLocator();
     #if (VTK_MAJOR_VERSION <= 5)
       delaunayTessellator->SetInput(surfaceNormals->GetOutput());
@@ -239,7 +236,7 @@ int vtkvmtkPolyDataCenterlines::RequestData(
     vtkUnstructuredGrid* delaunay = delaunayTessellator->GetOutput();
     delaunay->GetPointData()->AddArray(surfaceNormals->GetOutput()->GetPointData()->GetNormals());
 
-    vtkvmtkInternalTetrahedraExtractor* internalTetrahedraExtractor = vtkvmtkInternalTetrahedraExtractor::New();
+    auto internalTetrahedraExtractor = vtkSmartPointer<vtkvmtkInternalTetrahedraExtractor>::New();
     #if (VTK_MAJOR_VERSION <= 5)
       internalTetrahedraExtractor->SetInput(delaunayTessellator->GetOutput());
     #else
@@ -257,14 +254,11 @@ int vtkvmtkPolyDataCenterlines::RequestData(
 
     this->DelaunayTessellation = internalTetrahedraExtractor->GetOutput();
     this->DelaunayTessellation->Register(this);
-
-    delaunayTessellator->Delete();
-    internalTetrahedraExtractor->Delete();
   }
 
   if (this->GenerateVoronoiDiagram)
   {
-    vtkvmtkVoronoiDiagram3D* voronoiDiagramFilter = vtkvmtkVoronoiDiagram3D::New();
+    auto voronoiDiagramFilter = vtkSmartPointer<vtkvmtkVoronoiDiagram3D>::New();
     #if (VTK_MAJOR_VERSION <= 5)
       voronoiDiagramFilter->SetInput(this->DelaunayTessellation);
     #else
@@ -273,14 +267,14 @@ int vtkvmtkPolyDataCenterlines::RequestData(
     voronoiDiagramFilter->SetRadiusArrayName(this->RadiusArrayName);
     voronoiDiagramFilter->Update();
 
-    this->PoleIds = vtkIdList::New();
+    this->PoleIds = vtkSmartPointer<vtkIdList>::New();
     this->PoleIds->DeepCopy(voronoiDiagramFilter->GetPoleIds());
 
     vtkPolyData* voronoiDiagram = voronoiDiagramFilter->GetOutput();
 
     if (this->SimplifyVoronoi)
     {
-      vtkvmtkSimplifyVoronoiDiagram* voronoiDiagramSimplifier = vtkvmtkSimplifyVoronoiDiagram::New();
+      auto voronoiDiagramSimplifier = vtkSmartPointer<vtkvmtkSimplifyVoronoiDiagram>::New();
       #if (VTK_MAJOR_VERSION <= 5)
         voronoiDiagramSimplifier->SetInput(voronoiDiagramFilter->GetOutput());
       #else
@@ -290,14 +284,12 @@ int vtkvmtkPolyDataCenterlines::RequestData(
       voronoiDiagramSimplifier->Update();
       voronoiDiagram = voronoiDiagramSimplifier->GetOutput();
       voronoiDiagram->Register(this);
-      voronoiDiagramSimplifier->Delete();
     }
-    this->VoronoiDiagram = vtkPolyData::New();
+    this->VoronoiDiagram = vtkSmartPointer<vtkPolyData>::New();
     this->VoronoiDiagram->DeepCopy(voronoiDiagram);
-    voronoiDiagramFilter->Delete();
   }
 
-  vtkArrayCalculator* voronoiCostFunctionCalculator = vtkArrayCalculator::New();
+  auto voronoiCostFunctionCalculator = vtkSmartPointer<vtkArrayCalculator>::New();
   #if (VTK_MAJOR_VERSION <= 5)
     voronoiCostFunctionCalculator->SetInput(this->VoronoiDiagram);
   #else
@@ -314,10 +306,10 @@ int vtkvmtkPolyDataCenterlines::RequestData(
   voronoiCostFunctionCalculator->SetResultArrayName(this->CostFunctionArrayName);
   voronoiCostFunctionCalculator->Update();
 
-  vtkIdList* voronoiSourceSeedIds = vtkIdList::New();
-  vtkIdList* voronoiTargetSeedIds = vtkIdList::New();
+  auto voronoiSourceSeedIds = vtkSmartPointer<vtkIdList>::New();
+  auto voronoiTargetSeedIds = vtkSmartPointer<vtkIdList>::New();
 
-  vtkIdList* voronoiSeeds = vtkIdList::New();
+  auto voronoiSeeds = vtkSmartPointer<vtkIdList>::New();
 
   int i;
   if (this->CapCenterIds)
@@ -344,7 +336,7 @@ int vtkvmtkPolyDataCenterlines::RequestData(
     }
   }
 
-  vtkvmtkNonManifoldFastMarching* voronoiFastMarching = vtkvmtkNonManifoldFastMarching::New();
+  auto voronoiFastMarching = vtkSmartPointer<vtkvmtkNonManifoldFastMarching>::New();
   #if (VTK_MAJOR_VERSION <= 5)
     voronoiFastMarching->SetInput(vtkPolyData::SafeDownCast(voronoiCostFunctionCalculator->GetOutput()));
   #else
@@ -365,7 +357,7 @@ int vtkvmtkPolyDataCenterlines::RequestData(
     this->VoronoiDiagram->Update();
   #endif
 
-  vtkvmtkSteepestDescentLineTracer* centerlineBacktracing = vtkvmtkSteepestDescentLineTracer::New();
+  auto centerlineBacktracing = vtkSmartPointer<vtkvmtkSteepestDescentLineTracer>::New();
   #if (VTK_MAJOR_VERSION <= 5)
     centerlineBacktracing->SetInput(voronoiFastMarching->GetOutput());
   #else
@@ -385,7 +377,7 @@ int vtkvmtkPolyDataCenterlines::RequestData(
 
   vtkIdList* hitTargets = centerlineBacktracing->GetHitTargets();
 
-  vtkPoints* endPointPairs = vtkPoints::New();
+  auto endPointPairs = vtkSmartPointer<vtkPoints>::New();
 
   const vtkIdType numTargetSeedIds = this->TargetSeedIds->GetNumberOfIds();
   const vtkIdType numHitTargets = hitTargets->GetNumberOfIds();
@@ -424,22 +416,12 @@ int vtkvmtkPolyDataCenterlines::RequestData(
     }
   this->ReverseCenterlines();
 
-  surfaceNormals->Delete();
-  voronoiCostFunctionCalculator->Delete();
-  voronoiSeeds->Delete();
-  voronoiSourceSeedIds->Delete();
-  voronoiTargetSeedIds->Delete();
-  voronoiFastMarching->Delete();
-  centerlineBacktracing->Delete();
-  endPointPairs->Delete();
-  
   return 1;
 }
 
 void vtkvmtkPolyDataCenterlines::FindVoronoiSeeds(vtkUnstructuredGrid *delaunay, vtkIdList *boundaryBaricenterIds, vtkDataArray *normals, vtkIdList *seedIds)
 {
   vtkIdType i, j;
-  vtkIdList *pointCells;
   vtkIdType baricenterId;
   double baricenter[3], normal[3];
   double maxRadius, secondMaxRadius;
@@ -451,7 +433,7 @@ void vtkvmtkPolyDataCenterlines::FindVoronoiSeeds(vtkUnstructuredGrid *delaunay,
   pole[0] = pole[1] = pole[2] = 0.0;
   vtkIdType maxRadiusCellId, secondMaxRadiusCellId;
 
-  pointCells = vtkIdList::New();
+  auto pointCells = vtkSmartPointer<vtkIdList>::New();
 
   for (i=0; i<boundaryBaricenterIds->GetNumberOfIds(); i++)
     {
@@ -529,20 +511,18 @@ void vtkvmtkPolyDataCenterlines::FindVoronoiSeeds(vtkUnstructuredGrid *delaunay,
       seedIds->InsertNextId(secondMaxRadiusCellId);
       }
     }
-
-  pointCells->Delete();
 }
 
 void vtkvmtkPolyDataCenterlines::AppendEndPoints(vtkPoints* endPointPairs)
 {
   vtkIdType endPointId1, endPointId2;
   vtkPolyData* output = this->GetOutput();
-  vtkPolyData* completeCenterlines = vtkPolyData::New();
-  vtkPoints* completeCenterlinesPoints = vtkPoints::New();
-  vtkCellArray* completeCenterlinesCellArray = vtkCellArray::New();
-  vtkDoubleArray* completeCenterlinesRadiusArray = vtkDoubleArray::New();
+  auto completeCenterlines = vtkSmartPointer<vtkPolyData>::New();
+  auto completeCenterlinesPoints = vtkSmartPointer<vtkPoints>::New();
+  auto completeCenterlinesCellArray = vtkSmartPointer<vtkCellArray>::New();
+  auto completeCenterlinesRadiusArray = vtkSmartPointer<vtkDoubleArray>::New();
   completeCenterlinesRadiusArray->SetName(this->RadiusArrayName);
-  vtkIdList* completeCell = vtkIdList::New();
+  auto completeCell = vtkSmartPointer<vtkIdList>::New();
     
   vtkDoubleArray* centerlinesRadiusArray = vtkDoubleArray::SafeDownCast(output->GetPointData()->GetArray(this->RadiusArrayName));
 
@@ -581,23 +561,17 @@ void vtkvmtkPolyDataCenterlines::AppendEndPoints(vtkPoints* endPointPairs)
 #endif
   
   output->ShallowCopy(completeCenterlines);
-
-  completeCell->Delete();
-  completeCenterlines->Delete();
-  completeCenterlinesPoints->Delete();
-  completeCenterlinesCellArray->Delete();
-  completeCenterlinesRadiusArray->Delete();
 }
 
 void vtkvmtkPolyDataCenterlines::ResampleCenterlines()
 {
   vtkPolyData* output = this->GetOutput();
-  vtkPolyData* resampledCenterlines = vtkPolyData::New();
-  vtkPoints* resampledCenterlinesPoints = vtkPoints::New();
-  vtkCellArray* resampledCenterlinesCellArray = vtkCellArray::New();
-  vtkDoubleArray* resampledCenterlinesRadiusArray = vtkDoubleArray::New();
+  auto resampledCenterlines = vtkSmartPointer<vtkPolyData>::New();
+  auto resampledCenterlinesPoints = vtkSmartPointer<vtkPoints>::New();
+  auto resampledCenterlinesCellArray = vtkSmartPointer<vtkCellArray>::New();
+  auto resampledCenterlinesRadiusArray = vtkSmartPointer<vtkDoubleArray>::New();
   resampledCenterlinesRadiusArray->SetName(this->RadiusArrayName);
-  vtkIdList* resampledCell = vtkIdList::New();
+  auto resampledCell = vtkSmartPointer<vtkIdList>::New();
 
   vtkDoubleArray* centerlinesRadiusArray = vtkDoubleArray::SafeDownCast(output->GetPointData()->GetArray(this->RadiusArrayName));
 
@@ -672,20 +646,14 @@ void vtkvmtkPolyDataCenterlines::ResampleCenterlines()
 #endif
 
   output->ShallowCopy(resampledCenterlines);
-
-  resampledCenterlines->Delete();
-  resampledCenterlinesPoints->Delete();
-  resampledCenterlinesCellArray->Delete();
-  resampledCenterlinesRadiusArray->Delete();
-  resampledCell->Delete();
 }
 
 void vtkvmtkPolyDataCenterlines::ReverseCenterlines()
 {
   vtkPolyData* output = this->GetOutput();
 
-  vtkCellArray* reversedCenterlinesCellArray = vtkCellArray::New();
-  vtkIdList* reversedCell = vtkIdList::New();
+  auto reversedCenterlinesCellArray = vtkSmartPointer<vtkCellArray>::New();
+  auto reversedCell = vtkSmartPointer<vtkIdList>::New();
 
   for (int k=0; k<output->GetNumberOfCells(); k++)
     {
@@ -704,9 +672,6 @@ void vtkvmtkPolyDataCenterlines::ReverseCenterlines()
     }
 
   output->SetLines(reversedCenterlinesCellArray);
-
-  reversedCell->Delete();
-  reversedCenterlinesCellArray->Delete();
 }
 
 void vtkvmtkPolyDataCenterlines::PrintSelf(ostream& os, vtkIndent indent)

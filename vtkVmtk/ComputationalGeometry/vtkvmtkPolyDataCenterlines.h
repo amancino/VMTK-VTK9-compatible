@@ -131,11 +131,11 @@ class VTK_VMTK_COMPUTATIONAL_GEOMETRY_EXPORT vtkvmtkPolyDataCenterlines : public
 
   vtkIdList* CapCenterIds;
 
-  vtkUnstructuredGrid* DelaunayTessellation;
+  vtkSmartPointer<vtkUnstructuredGrid> DelaunayTessellation;
 
-  vtkPolyData* VoronoiDiagram;
+  vtkSmartPointer<vtkPolyData> VoronoiDiagram;
 
-  vtkIdList* PoleIds;
+  vtkSmartPointer<vtkIdList> PoleIds;
 
   char* RadiusArrayName;
   char* CostFunction;

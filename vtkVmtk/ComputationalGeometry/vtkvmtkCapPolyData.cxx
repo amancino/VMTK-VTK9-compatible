@@ -40,25 +40,23 @@ vtkStandardNewMacro(vtkvmtkCapPolyData);
 
 vtkvmtkCapPolyData::vtkvmtkCapPolyData()
 {
-  this->BoundaryIds = NULL;
+  this->BoundaryIds = nullptr;
   this->Displacement = 1E-1;
   this->InPlaneDisplacement = 1E-1;
-  this->CapCenterIds = NULL;
-  this->CellEntityIdsArrayName = NULL;
+  this->CapCenterIds = nullptr;
+  this->CellEntityIdsArrayName = nullptr;
   this->CellEntityIdOffset = 1;
 }
 
 vtkvmtkCapPolyData::~vtkvmtkCapPolyData()
 {
   if (this->BoundaryIds)
-    {
-    this->BoundaryIds->Delete();
-    this->BoundaryIds = NULL;
-    }
+  {
+    this->BoundaryIds = nullptr;
+  }
   if (this->CapCenterIds)
     {
-    this->CapCenterIds->Delete();
-    this->CapCenterIds = NULL;
+    this->CapCenterIds = nullptr;
     }
   if (this->CellEntityIdsArrayName)
     {
@@ -83,44 +81,41 @@ int vtkvmtkCapPolyData::RequestData(
   // Declare
   vtkIdType barycenterId, trianglePoints[3];
   vtkIdType i, j;
-  vtkvmtkPolyDataBoundaryExtractor* boundaryExtractor;
   vtkPolyData* boundaries;
-  vtkPoints* newPoints;
-  vtkCellArray* newPolys;
   vtkPolyLine* boundary;
 
   // Initialize
   if ( ((input->GetNumberOfPoints()) < 1) )
     {
-    //vtkErrorMacro(<< "No input!");
-    return 1;
+      //vtkErrorMacro(<< "No input!");
+      return 1;
     }
   input->BuildLinks();
 
   // Allocate
-  newPoints = vtkPoints::New();
+  auto newPoints = vtkSmartPointer<vtkPoints>::New();
   newPoints->DeepCopy(input->GetPoints());
-  newPolys = vtkCellArray::New();
+  auto newPolys = vtkSmartPointer<vtkCellArray>::New();
   newPolys->DeepCopy(input->GetPolys());
-  boundaryExtractor = vtkvmtkPolyDataBoundaryExtractor::New();
+  auto boundaryExtractor = vtkSmartPointer<vtkvmtkPolyDataBoundaryExtractor>::New();
 
   // Copy cell entitiy ids array
-  vtkIdTypeArray* cellEntityIdsArray = NULL;
+  vtkSmartPointer<vtkIdTypeArray> cellEntityIdsArray = nullptr;
   bool markCells = this->CellEntityIdsArrayName && this->CellEntityIdsArrayName[0];
   if (markCells)
-    {
-    cellEntityIdsArray = vtkIdTypeArray::New();
+  {
+    cellEntityIdsArray = vtkSmartPointer<vtkIdTypeArray>::New();
     cellEntityIdsArray->SetName(this->CellEntityIdsArrayName);
     if (input->GetCellData()->GetArray(this->CellEntityIdsArrayName))
-      {
+    {
       cellEntityIdsArray->DeepCopy(input->GetCellData()->GetArray(this->CellEntityIdsArrayName));
-      }
+    }
     else
-      {
+    {
       cellEntityIdsArray->SetNumberOfTuples(newPolys->GetNumberOfCells());
       cellEntityIdsArray->FillComponent(0,static_cast<double>(this->CellEntityIdOffset));
-      }
     }
+  }
 
   // Execute
 #if (VTK_MAJOR_VERSION <= 5)
@@ -133,29 +128,28 @@ int vtkvmtkCapPolyData::RequestData(
   boundaries = boundaryExtractor->GetOutput();
 
   if (this->CapCenterIds)
-    {
-    this->CapCenterIds->Delete();
+  {
     this->CapCenterIds = NULL;
-    }
+  }
 
-  this->CapCenterIds = vtkIdList::New();
+  this->CapCenterIds = vtkSmartPointer<vtkIdList>::New();
   this->CapCenterIds->SetNumberOfIds(boundaries->GetNumberOfCells());
   for (i=0; i<this->CapCenterIds->GetNumberOfIds(); i++)
-    {
+  {
     this->CapCenterIds->SetId(i,-1);
-    }
+  }
 
   double barycenter[3], normal[3], outwardNormal[3], meanRadius;
 
   for (i=0; i<boundaries->GetNumberOfCells(); i++)
-    {
+  {
     if (this->BoundaryIds)
-      {
+    {
       if (this->BoundaryIds->IsId(i) == -1)
-        {
+      {
         continue;
-        }
       }
+    }
     boundary = vtkPolyLine::SafeDownCast(boundaries->GetCell(i));
 
     vtkvmtkBoundaryReferenceSystems::ComputeBoundaryBarycenter(boundary->GetPoints(),barycenter);
@@ -188,9 +182,9 @@ int vtkvmtkCapPolyData::RequestData(
       newPolys->InsertNextCell(3,trianglePoints);
 
       if (markCells)
-        {
+      {
         cellEntityIdsArray->InsertNextValue(i+1+this->CellEntityIdOffset);
-        }
+      }
 
       }
     }
@@ -199,18 +193,12 @@ int vtkvmtkCapPolyData::RequestData(
   output->SetPolys(newPolys);
 
   if (markCells)
-    {
+  {
     output->GetCellData()->AddArray(cellEntityIdsArray);
-    cellEntityIdsArray->Delete();
-    }
+  }
 
   // TODO: the filter throws all the point and cell data
   //output->GetPointData()->PassData(input->GetPointData()); // Like this?
-
-  // Destroy
-  newPoints->Delete();
-  newPolys->Delete();
-  boundaryExtractor->Delete();
 
   return 1;
 }
