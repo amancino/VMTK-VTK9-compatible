@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.18)
 
 project(VMTK)
 
@@ -77,7 +77,7 @@ endif( USE_SYSTEM_VTK )
 #-----------------------------------------------------------------------------
 # Superbuild setup
 option( VMTK_USE_SUPERBUILD
-  "Build VMTK and the projects it depends on via SuperBuild.cmake." ON )
+  "Build VMTK and the projects it depends on via SuperBuild.cmake." OFF )
 
 # option( VMTK_USE_VTK7
 #  "Compile vmtk against VTK 7. OFF is VTK 6.3." ON )

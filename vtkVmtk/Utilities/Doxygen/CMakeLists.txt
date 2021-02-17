@@ -1,10 +1,10 @@
 #
 # Build the documentation
 #
-include (${CMAKE_ROOT}/Modules/Documentation.cmake OPTIONAL)
                                                                                                                
 if (BUILD_DOCUMENTATION)
-                                                                                                               
+
+	include (${CMAKE_ROOT}/Modules/Documentation.cmake OPTIONAL)																																																					
   #
   # Configure the script and the doxyfile, then add target
   #
