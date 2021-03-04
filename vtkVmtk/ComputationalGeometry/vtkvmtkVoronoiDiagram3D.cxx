@@ -37,14 +37,12 @@ vtkStandardNewMacro(vtkvmtkVoronoiDiagram3D);
 vtkvmtkVoronoiDiagram3D::vtkvmtkVoronoiDiagram3D()
 {
   this->BuildLines = 0;
-  this->PoleIds = vtkIdList::New();
+  this->PoleIds = vtkSmartPointer<vtkIdList>::New();
   this->RadiusArrayName = NULL;
 }
 
 vtkvmtkVoronoiDiagram3D::~vtkvmtkVoronoiDiagram3D()
 {
-  this->PoleIds->Delete();
-
   if (this->RadiusArrayName)
     {
     delete[] this->RadiusArrayName;
@@ -65,16 +63,13 @@ void vtkvmtkVoronoiDiagram3D::ExtractUniqueEdges(vtkUnstructuredGrid* input, vtk
   vtkIdType edgePts[2];
   vtkIdType npts;
   vtkIdType const *pts;
-  vtkIntArray* visited;
-  vtkIdList* pointCells;
-  vtkIdList* insertedLoopPoints;
 
-  visited = vtkIntArray::New();
+  auto visited = vtkSmartPointer<vtkIntArray>::New();
   visited->SetNumberOfTuples(input->GetNumberOfPoints());
   visited->FillComponent(0,0);
 
-  pointCells = vtkIdList::New();
-  insertedLoopPoints = vtkIdList::New();
+  auto pointCells = vtkSmartPointer<vtkIdList>::New();
+  auto insertedLoopPoints = vtkSmartPointer<vtkIdList>::New();
 
   for (i=0; i<input->GetNumberOfPoints(); i++)
     {           
@@ -99,11 +94,6 @@ void vtkvmtkVoronoiDiagram3D::ExtractUniqueEdges(vtkUnstructuredGrid* input, vtk
         }
       }
     }
-
-  visited->Delete();
-  pointCells->Delete();
-  insertedLoopPoints->Delete();
-
 }
 
 void vtkvmtkVoronoiDiagram3D::BuildVoronoiPolys(vtkUnstructuredGrid* input, vtkCellArray* voronoiPolys)
@@ -114,20 +104,14 @@ void vtkvmtkVoronoiDiagram3D::BuildVoronoiPolys(vtkUnstructuredGrid* input, vtkC
   pts = NULL;
   vtkIdType neighborTetraId;
   vtkIdType i, k, h;
-  vtkCellArray* edgeArray;
-  vtkIdList* polyIds;
-  vtkIdList* neighborCells;
-  vtkIdList* neighborTrianglePointIds;
-  vtkIdList* neighborNeighborCells;
-  vtkIdList* linePointIds;
   vtkTetra* neighborTetra;
 
-  edgeArray = vtkCellArray::New();
-  polyIds = vtkIdList::New();
-  neighborCells = vtkIdList::New();
-  neighborTrianglePointIds = vtkIdList::New();
-  neighborNeighborCells = vtkIdList::New();
-  linePointIds = vtkIdList::New();
+  auto edgeArray = vtkSmartPointer<vtkCellArray>::New();
+  auto polyIds = vtkSmartPointer<vtkIdList>::New();
+  auto neighborCells = vtkSmartPointer<vtkIdList>::New();
+  auto neighborTrianglePointIds = vtkSmartPointer<vtkIdList>::New();
+  auto neighborNeighborCells = vtkSmartPointer<vtkIdList>::New();
+  auto linePointIds = vtkSmartPointer<vtkIdList>::New();
 
   this->ExtractUniqueEdges(input,edgeArray);
 
@@ -180,13 +164,6 @@ void vtkvmtkVoronoiDiagram3D::BuildVoronoiPolys(vtkUnstructuredGrid* input, vtkC
     if (!boundaryTetra)
       voronoiPolys->InsertNextCell(polyIds);
     }
-
-  edgeArray->Delete();
-  polyIds->Delete();
-  neighborCells->Delete();
-  neighborTrianglePointIds->Delete();
-  neighborNeighborCells->Delete();
-  linePointIds->Delete();
 }
 
 int vtkvmtkVoronoiDiagram3D::RequestData(
@@ -207,28 +184,24 @@ int vtkvmtkVoronoiDiagram3D::RequestData(
   double tetraCenter[3], tetraRadius;
   double currentRadius;
   vtkIdType i, j, id, poleId;
-  vtkPoints* newPoints;
-  vtkCellArray* newPolys;
-  vtkCellArray* newLines;
-  vtkDoubleArray* newScalars;
+
   vtkDoubleArray* thicknessScalars;
-  vtkIdList* cellIds;
   vtkTetra* tetra;
 
   poleId = -1;
 
   // Allocate
-  newPoints = vtkPoints::New();
+  auto newPoints = vtkSmartPointer<vtkPoints>::New();
   newPoints->SetNumberOfPoints(input->GetNumberOfCells());
-  newScalars = vtkDoubleArray::New();
+  auto newScalars = vtkSmartPointer<vtkDoubleArray>::New();
   newScalars->SetNumberOfTuples(input->GetNumberOfCells());
-  newPolys = vtkCellArray::New();
-  newLines = vtkCellArray::New();
+  auto newPolys = vtkSmartPointer<vtkCellArray>::New();
+  auto newLines = vtkSmartPointer<vtkCellArray>::New();
   thicknessScalars = vtkDoubleArray::New();
   thicknessScalars->SetNumberOfTuples(input->GetNumberOfPoints());
   thicknessScalars->FillComponent(0,0.0);
 
-  cellIds = vtkIdList::New();
+  auto cellIds = vtkSmartPointer<vtkIdList>::New();
 
   this->PoleIds->SetNumberOfIds(input->GetNumberOfPoints());
 
@@ -298,14 +271,6 @@ int vtkvmtkVoronoiDiagram3D::RequestData(
     {
     output->SetLines(newLines);
     }
-
-  // Destroy
-  newPoints->Delete();
-  newPolys->Delete();
-  newLines->Delete();
-  newScalars->Delete();
-  thicknessScalars->Delete();
-  cellIds->Delete();
 
   return 1;
 }

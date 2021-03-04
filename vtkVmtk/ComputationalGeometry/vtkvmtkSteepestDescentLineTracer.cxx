@@ -48,12 +48,11 @@ vtkvmtkSteepestDescentLineTracer::vtkvmtkSteepestDescentLineTracer()
 
   this->LineDataArray = NULL;
 
-  this->HitTargets = vtkIdList::New();
+  this->HitTargets = vtkSmartPointer<vtkIdList>::New();
 }
 
 vtkvmtkSteepestDescentLineTracer::~vtkvmtkSteepestDescentLineTracer()
 {
-  this->HitTargets->Delete();
 
   if (this->Seeds)
     {
@@ -66,6 +65,7 @@ vtkvmtkSteepestDescentLineTracer::~vtkvmtkSteepestDescentLineTracer()
     this->Targets->Delete();
     this->Targets = NULL;
     }
+
 
   if (this->EdgePCoordArrayName)
     {
@@ -104,9 +104,7 @@ void vtkvmtkSteepestDescentLineTracer::Backtrace(vtkPolyData* input, vtkIdType s
   double previousS, previousS2;
   double previousPoint[3];
   double directionFactor;
-  vtkIdList* neighborCells;
   vtkIdType pointId, j, targetId;
-  vtkIdList* lineIds;
 
   vtkPoints* newPoints;
   vtkDataArray* newScalars;
@@ -116,8 +114,8 @@ void vtkvmtkSteepestDescentLineTracer::Backtrace(vtkPolyData* input, vtkIdType s
   newScalars = this->GetOutput()->GetPointData()->GetArray(this->DataArrayName);
   newLines = this->GetOutput()->GetLines();
 
-  neighborCells = vtkIdList::New();
-  lineIds = vtkIdList::New();
+  auto neighborCells = vtkSmartPointer<vtkIdList>::New();
+  auto lineIds = vtkSmartPointer<vtkIdList>::New();
 
   directionFactor = 0.0;
   if (this->Direction==VTK_VMTK_DOWNWARD)
@@ -295,9 +293,6 @@ void vtkvmtkSteepestDescentLineTracer::Backtrace(vtkPolyData* input, vtkIdType s
     }
 
   newLines->InsertNextCell(lineIds);
-
-  neighborCells->Delete();
-  lineIds->Delete();
 }
 
 int vtkvmtkSteepestDescentLineTracer::RequestData(
@@ -314,9 +309,6 @@ int vtkvmtkSteepestDescentLineTracer::RequestData(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkIdType i;
-  vtkPoints* newPoints;
-  vtkCellArray* newLines;
-  vtkDoubleArray* newScalars;
 
   if (!this->DescentArrayName)
     {
@@ -380,10 +372,10 @@ int vtkvmtkSteepestDescentLineTracer::RequestData(
     this->LineDataArray = this->DescentArray;
     }
 
-  this->Edges = vtkIntArray::New();
-  this->EdgeParCoords = vtkDoubleArray::New();
-  this->CellIdsArray = vtkIntArray::New();
-  this->PCoordsArray = vtkDoubleArray::New();
+  this->Edges = vtkSmartPointer<vtkIntArray>::New();
+  this->EdgeParCoords = vtkSmartPointer<vtkDoubleArray>::New();
+  this->CellIdsArray = vtkSmartPointer<vtkIntArray>::New();
+  this->PCoordsArray = vtkSmartPointer<vtkDoubleArray>::New();
 
   this->Edges->SetNumberOfComponents(2);
   this->CellIdsArray->SetNumberOfComponents(2);
@@ -406,9 +398,9 @@ int vtkvmtkSteepestDescentLineTracer::RequestData(
     this->EdgeParCoords->SetName("EdgePCoords");
     }
 
-  newPoints = vtkPoints::New();
-  newLines = vtkCellArray::New();
-  newScalars = vtkDoubleArray::New();
+  auto newPoints = vtkSmartPointer<vtkPoints>::New();
+  auto newLines = vtkSmartPointer<vtkCellArray>::New();
+  auto newScalars = vtkSmartPointer<vtkDoubleArray>::New();
   newScalars->SetName(this->DataArrayName);
 
   if (this->MergeTolerance < VTK_VMTK_DOUBLE_TOL)
@@ -419,10 +411,6 @@ int vtkvmtkSteepestDescentLineTracer::RequestData(
   output->SetPoints(newPoints);
   output->SetLines(newLines);
   output->GetPointData()->AddArray(newScalars);
-
-  newPoints->Delete();
-  newLines->Delete();
-  newScalars->Delete();
 
   input->BuildCells();
   input->BuildLinks();
@@ -436,11 +424,6 @@ int vtkvmtkSteepestDescentLineTracer::RequestData(
 
   output->GetPointData()->AddArray(this->Edges);
   output->GetPointData()->AddArray(this->EdgeParCoords);
-
-  this->Edges->Delete();
-  this->EdgeParCoords->Delete();
-  this->CellIdsArray->Delete();
-  this->PCoordsArray->Delete();
 
   return 1;
 }

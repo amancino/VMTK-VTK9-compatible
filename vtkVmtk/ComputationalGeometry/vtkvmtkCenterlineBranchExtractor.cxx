@@ -88,10 +88,10 @@ void vtkvmtkCenterlineBranchExtractor::ComputeCenterlineSplitting(vtkPolyData* i
   tube->SetInput(input);
   tube->SetPolyBallRadiusArrayName(this->RadiusArrayName);
 
-  vtkIdList* tubeCellIds = vtkIdList::New();
+  auto tubeCellIds = vtkSmartPointer<vtkIdList>::New();
 
-  vtkIdList* intersectionSubIds = vtkIdList::New();
-  vtkDoubleArray* intersectionPCoords = vtkDoubleArray::New();
+  auto intersectionSubIds = vtkSmartPointer<vtkIdList>::New();
+  auto intersectionPCoords = vtkSmartPointer<vtkDoubleArray>::New();
 
   vtkIdType numberOfCells = input->GetNumberOfCells();
 
@@ -201,8 +201,8 @@ void vtkvmtkCenterlineBranchExtractor::ComputeCenterlineSplitting(vtkPolyData* i
   const int numberOfGapSpheres = 1;
   const bool forward = true;
 
-  vtkIdList* touchingSubIds = vtkIdList::New();
-  vtkDoubleArray* touchingPCoords = vtkDoubleArray::New();
+  auto touchingSubIds = vtkSmartPointer<vtkIdList>::New();
+  auto touchingPCoords = vtkSmartPointer<vtkDoubleArray>::New();
 
   int i;
   for (i=0; i<intersectionSubIds->GetNumberOfIds(); i++)
@@ -221,9 +221,9 @@ void vtkvmtkCenterlineBranchExtractor::ComputeCenterlineSplitting(vtkPolyData* i
     touchingPCoords->InsertNextValue(touchingPCoord);
     }
 
-  vtkIdList* splittingSubIds = vtkIdList::New();
-  vtkDoubleArray* splittingPCoords = vtkDoubleArray::New();
-  vtkIdList* blankingFlags = vtkIdList::New();
+  auto splittingSubIds = vtkSmartPointer<vtkIdList>::New();
+  auto splittingPCoords = vtkSmartPointer<vtkDoubleArray>::New();
+  auto blankingFlags = vtkSmartPointer<vtkIdList>::New();
 
   blankingFlags->InsertNextId(0);
 /*
@@ -334,18 +334,6 @@ void vtkvmtkCenterlineBranchExtractor::ComputeCenterlineSplitting(vtkPolyData* i
     {
     this->TractBlanking[i] = blankingFlags->GetId(i);
     }
-
-  tubeCellIds->Delete();
-
-  intersectionSubIds->Delete();
-  intersectionPCoords->Delete();
-
-  touchingSubIds->Delete();
-  touchingPCoords->Delete();
-
-  splittingSubIds->Delete();
-  splittingPCoords->Delete();
-  blankingFlags->Delete();
 }
 
 void vtkvmtkCenterlineBranchExtractor::GroupTracts(vtkPolyData* input, vtkPolyData* centerlineTracts)

@@ -489,14 +489,14 @@ void vtkvmtkPolyDataCenterlines::FindVoronoiSeeds(vtkUnstructuredGrid *delaunay,
       referenceVector[2] = circumcenter[2] - baricenter[2];
       
       if ((tetraRadius - secondMaxRadius > VTK_VMTK_DOUBLE_TOL) && (vtkMath::Dot(poleVector,referenceVector) < VTK_VMTK_DOUBLE_TOL))
-        {
+      {
         secondMaxRadius = tetraRadius;
         secondMaxRadiusCellId = pointCells->GetId(j);
         secondPole[0] = circumcenter[0];
         secondPole[1] = circumcenter[1];
         secondPole[2] = circumcenter[2];
-        }
       }
+    }
 
     secondPoleVector[0] = secondPole[0] - baricenter[0];
     secondPoleVector[1] = secondPole[1] - baricenter[1];

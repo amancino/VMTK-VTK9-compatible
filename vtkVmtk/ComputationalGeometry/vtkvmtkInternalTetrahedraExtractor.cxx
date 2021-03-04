@@ -86,9 +86,6 @@ int vtkvmtkInternalTetrahedraExtractor::RequestData(
   bool boundaryTetra;
   bool allDotPositive, allDotMinusOnePositive;
   vtkIdType i, j;
-  vtkCellArray* newTetras;
-  vtkIdList* newCellTypes;
-  vtkIntArray* keepCell;
   vtkDataArray* outwardPointNormals;
   vtkTetra* tetra;
 
@@ -137,9 +134,9 @@ int vtkvmtkInternalTetrahedraExtractor::RequestData(
     }
 
   // Allocate
-  newTetras = vtkCellArray::New();
-  newCellTypes = vtkIdList::New();
-  keepCell = vtkIntArray::New();
+  auto newTetras = vtkSmartPointer<vtkCellArray>::New();
+  auto newCellTypes = vtkSmartPointer<vtkIdList>::New();
+  auto keepCell = vtkSmartPointer<vtkIntArray>::New();
   keepCell->SetNumberOfTuples(input->GetNumberOfCells());
 
   // Execute 
@@ -229,7 +226,7 @@ int vtkvmtkInternalTetrahedraExtractor::RequestData(
     double pt0[3], pt1[3], pt2[3];
     this->Surface->BuildLinks();
 
-    vtkIdList* cellNeighbors = vtkIdList::New();
+    auto cellNeighbors = vtkSmartPointer<vtkIdList>::New();
     for (i=0; i<input->GetNumberOfCells(); i++)
       {
       if (keepCell->GetValue(i) == 0)
@@ -294,7 +291,6 @@ int vtkvmtkInternalTetrahedraExtractor::RequestData(
           }
         }
       }
-    cellNeighbors->Delete();
     }
  
   for (i=0; i<input->GetNumberOfCells(); i++)
@@ -317,10 +313,6 @@ int vtkvmtkInternalTetrahedraExtractor::RequestData(
   output->SetCells(newCellTypesInt,newTetras);
 
   // Destroy
-  newTetras->Delete();
-  newCellTypes->Delete();
-  keepCell->Delete();
-
   delete[] newCellTypesInt;
 
   return 1;

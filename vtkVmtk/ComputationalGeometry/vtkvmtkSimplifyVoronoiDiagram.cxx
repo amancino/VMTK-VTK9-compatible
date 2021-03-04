@@ -43,17 +43,6 @@ vtkvmtkSimplifyVoronoiDiagram::vtkvmtkSimplifyVoronoiDiagram()
 
 vtkvmtkSimplifyVoronoiDiagram::~vtkvmtkSimplifyVoronoiDiagram()
 {
-  if (this->UnremovablePointIds)
-    {
-    this->UnremovablePointIds->Delete();
-    this->UnremovablePointIds = NULL;
-    }
-
-  if (this->UnremovableCellIds)
-    {
-    this->UnremovableCellIds->Delete();
-    this->UnremovableCellIds = NULL;
-    }
 }
 
 vtkIdType vtkvmtkSimplifyVoronoiDiagram::IsBoundaryEdge(vtkCellLinks* links, vtkIdType* edge)
@@ -114,13 +103,11 @@ int vtkvmtkSimplifyVoronoiDiagram::RequestData(
   npts = 0;
   pts = NULL;
   vtkIdType edge[2];
-  vtkCellArray *currentPolys;
-  vtkCellLinks* currentLinks;
   vtkIdType newCellId;
   vtkCellArray* inputPolys = input->GetPolys();
 
-  currentPolys = vtkCellArray::New();
-  currentLinks = vtkCellLinks::New();
+  auto currentPolys = vtkSmartPointer<vtkCellArray>::New();
+  auto currentLinks = vtkSmartPointer<vtkCellLinks>::New();
 
   n = 0;
   if (this->Simplification==VTK_VMTK_REMOVE_BOUNDARY_POINTS)
@@ -189,8 +176,8 @@ int vtkvmtkSimplifyVoronoiDiagram::RequestData(
   while (anyRemoved)
     {
     anyRemoved = false;
-    vtkCellArray* newPolys = vtkCellArray::New();
-    vtkIdList* newCell = vtkIdList::New();
+    auto newPolys = vtkSmartPointer<vtkCellArray>::New();
+    auto newCell = vtkSmartPointer<vtkIdList>::New();
     currentPolys->InitTraversal();
     for (i=0; i<currentPolys->GetNumberOfCells(); i++)
       {
@@ -269,13 +256,11 @@ int vtkvmtkSimplifyVoronoiDiagram::RequestData(
       }
 
     currentPolys->DeepCopy(newPolys);
-    currentLinks->Delete();
-    currentLinks = vtkCellLinks::New();
+
+    currentLinks = vtkSmartPointer<vtkCellLinks>::New();
     currentLinks->Allocate(input->GetNumberOfPoints());
     currentLinks->BuildLinks(input);
 
-    newPolys->Delete();
-    newCell->Delete();
     if (this->OnePassOnly)
       {
       break;
@@ -284,8 +269,8 @@ int vtkvmtkSimplifyVoronoiDiagram::RequestData(
   
   if (anyUnremovable && !this->IncludeUnremovable)
     {
-    vtkCellArray* newPolys = vtkCellArray::New();
-    vtkIdList* newCell = vtkIdList::New();
+    auto newPolys = vtkSmartPointer<vtkCellArray>::New();
+    auto newCell = vtkSmartPointer<vtkIdList>::New();
     currentPolys->InitTraversal();
     for (i=0; i<currentPolys->GetNumberOfCells(); i++)
       {
@@ -309,8 +294,6 @@ int vtkvmtkSimplifyVoronoiDiagram::RequestData(
         }
       }
     currentPolys->DeepCopy(newPolys);
-    newPolys->Delete();
-    newCell->Delete();
     }
 
   // simply passes points and point data (eventually vtkCleanPolyData)
@@ -320,8 +303,6 @@ int vtkvmtkSimplifyVoronoiDiagram::RequestData(
   // WARNING: cell data are thrown away in the current version
   output->SetPolys(currentPolys);
 
-  currentLinks->Delete();
-  currentPolys->Delete();
   delete[] isUnremovable;
 
   return 1;

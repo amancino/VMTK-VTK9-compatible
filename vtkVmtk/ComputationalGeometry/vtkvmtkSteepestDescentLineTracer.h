@@ -109,7 +109,7 @@ protected:
   vtkIdList* Seeds;
   vtkIdList* Targets;
 
-  vtkIdList* HitTargets;
+  vtkSmartPointer<vtkIdList> HitTargets;
 
   int StopOnTargets;
 
@@ -122,12 +122,12 @@ protected:
   int MergePaths;
   double MergeTolerance;
 
-  vtkIntArray* Edges;
-  vtkDoubleArray* EdgeParCoords;
+  vtkSmartPointer<vtkIntArray> Edges;
+  vtkSmartPointer<vtkDoubleArray> EdgeParCoords;
 
   vtkIdList* EdgePointIds;
-  vtkIntArray* CellIdsArray;
-  vtkDoubleArray* PCoordsArray;
+  vtkSmartPointer<vtkIntArray> CellIdsArray;
+  vtkSmartPointer<vtkDoubleArray> PCoordsArray;
   vtkDoubleArray* MinDistanceArray;
 
   vtkDataArray* LineDataArray;

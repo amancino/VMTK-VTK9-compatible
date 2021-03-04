@@ -131,7 +131,7 @@ double vtkvmtkPolyBallLine::EvaluateFunction(double x[3])
   this->LastPolyBallCenter[0] = this->LastPolyBallCenter[1] = this->LastPolyBallCenter[2] = 0.0;
   this->LastPolyBallCenterRadius = 0.0;
 
-  vtkIdList* cellIds = vtkIdList::New();
+  auto cellIds = vtkSmartPointer<vtkIdList>::New();
 
   if (this->InputCellIds)
     {
@@ -235,8 +235,6 @@ double vtkvmtkPolyBallLine::EvaluateFunction(double x[3])
         }
       }
     }
-  
-  cellIds->Delete();
 
   return minPolyBallFunctionValue;
 }

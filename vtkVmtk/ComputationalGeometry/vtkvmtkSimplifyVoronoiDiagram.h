@@ -79,8 +79,8 @@ class VTK_VMTK_COMPUTATIONAL_GEOMETRY_EXPORT vtkvmtkSimplifyVoronoiDiagram : pub
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
   vtkIdType IsBoundaryEdge(vtkCellLinks* links, vtkIdType* edge);
 
-  vtkIdList* UnremovablePointIds;
-  vtkIdList* UnremovableCellIds;
+  vtkSmartPointer<vtkIdList> UnremovablePointIds;
+  vtkSmartPointer<vtkIdList> UnremovableCellIds;
 
   int Simplification;
   int IncludeUnremovable;
