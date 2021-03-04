@@ -161,27 +161,24 @@ int vtkvmtkCenterlineSplittingAndGroupingFilter::RequestData(
 
   numberOfInputCells = input->GetNumberOfCells();
 
-  vtkAppendPolyData* appendCenterlinesFilter  = vtkAppendPolyData::New();
+  auto appendCenterlinesFilter  = vtkSmartPointer<vtkAppendPolyData>::New();
 
   for (int i=0; i<numberOfInputCells; i++)
     {
     this->ComputeCenterlineSplitting(input,i);
-    vtkPolyData* splitCenterline = vtkPolyData::New();
+    auto splitCenterline = vtkSmartPointer<vtkPolyData>::New();
     this->SplitCenterline(input,i,this->NumberOfSplittingPoints,this->SubIds,this->PCoords,this->TractBlanking,splitCenterline);
 #if (VTK_MAJOR_VERSION <= 5)
     appendCenterlinesFilter->AddInput(splitCenterline);
 #else
     appendCenterlinesFilter->AddInputData(splitCenterline);
 #endif
-    splitCenterline->Delete();
     }
   
   appendCenterlinesFilter->Update();
 
-  vtkPolyData* centerlineTracts = vtkPolyData::New();
+  auto centerlineTracts = vtkSmartPointer<vtkPolyData>::New();
   centerlineTracts->DeepCopy(appendCenterlinesFilter->GetOutput());
-
-  appendCenterlinesFilter->Delete();
 
   this->GroupTracts(input,centerlineTracts);
   this->MergeTracts(centerlineTracts); 
@@ -191,25 +188,23 @@ int vtkvmtkCenterlineSplittingAndGroupingFilter::RequestData(
 
   output->DeepCopy(centerlineTracts);
 
-  centerlineTracts->Delete();
-
   return 1;
 }
 
 void vtkvmtkCenterlineSplittingAndGroupingFilter::MergeTracts(vtkPolyData* centerlineTracts)
 {
   int numberOfCenterlineCells = centerlineTracts->GetNumberOfCells();
-  vtkPolyData* mergedCenterlineTracts = vtkPolyData::New();
-  vtkPoints* mergedCenterlineTractsPoints = vtkPoints::New();
+  auto mergedCenterlineTracts = vtkSmartPointer<vtkPolyData>::New();
+  auto mergedCenterlineTractsPoints = vtkSmartPointer<vtkPoints>::New();
   mergedCenterlineTractsPoints->DeepCopy(centerlineTracts->GetPoints());
   mergedCenterlineTracts->SetPoints(mergedCenterlineTractsPoints);
   mergedCenterlineTracts->GetPointData()->DeepCopy(centerlineTracts->GetPointData());
   mergedCenterlineTracts->GetCellData()->CopyAllocate(centerlineTracts->GetCellData());
   
-  vtkCellArray* mergedCellArray = vtkCellArray::New();
+  auto mergedCellArray = vtkSmartPointer<vtkCellArray>::New();
 
   vtkIntArray* groupIdsArray = vtkIntArray::SafeDownCast(centerlineTracts->GetCellData()->GetArray(this->GroupIdsArrayName));
-  vtkIdList* centerlineCellIds = vtkIdList::New();
+  auto centerlineCellIds = vtkSmartPointer<vtkIdList>::New();
   int i;
   for (i=0; i<numberOfCenterlineCells; i++)
     {
@@ -239,8 +234,8 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::MergeTracts(vtkPolyData* cente
       }
     
     // at this point we have to merge based on the repeated groupIds (which are now adjacent)
-    vtkIdList* tractCellPointIds = vtkIdList::New();
-    vtkIdList* mergedCellPointIds = vtkIdList::New();
+    auto tractCellPointIds = vtkSmartPointer<vtkIdList>::New();
+    auto mergedCellPointIds = vtkSmartPointer<vtkIdList>::New();
     int previousGroupId = -1;
     int currentMergedCellId = -1;
     int firstTractCellId = 0;
@@ -277,18 +272,11 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::MergeTracts(vtkPolyData* cente
         }
       previousGroupId = groupId;
       }
-    tractCellPointIds->Delete();
-    mergedCellPointIds->Delete();
     }
 
   mergedCenterlineTracts->SetLines(mergedCellArray);
     
   centerlineTracts->DeepCopy(mergedCenterlineTracts);
-  
-  mergedCellArray->Delete();
-  mergedCenterlineTracts->Delete();
-  mergedCenterlineTractsPoints->Delete();
-  centerlineCellIds->Delete();
 }
 
 void vtkvmtkCenterlineSplittingAndGroupingFilter::GroupTracts(vtkPolyData* input, vtkPolyData* centerlineTracts)
@@ -311,7 +299,7 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::GroupTracts(vtkPolyData* input
 
 void vtkvmtkCenterlineSplittingAndGroupingFilter::CoincidentExtremePointGroupTracts(vtkPolyData* input, vtkPolyData* centerlineTracts, bool first)
 {
-  vtkIntArray* groupIdsArray = vtkIntArray::New();
+  auto groupIdsArray = vtkSmartPointer<vtkIntArray>::New();
   groupIdsArray->SetName(this->GroupIdsArrayName);
   int numberOfCells = centerlineTracts->GetNumberOfCells();
   groupIdsArray->SetNumberOfComponents(1);
@@ -365,8 +353,6 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::CoincidentExtremePointGroupTra
     }
  
   centerlineTracts->GetCellData()->AddArray(groupIdsArray);
-
-  groupIdsArray->Delete();
 }
 
 void vtkvmtkCenterlineSplittingAndGroupingFilter::PointInTubeGroupTracts(vtkPolyData* input, vtkPolyData* centerlineTracts)
@@ -374,7 +360,7 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::PointInTubeGroupTracts(vtkPoly
   vtkIntArray* blankingArray = vtkIntArray::SafeDownCast(centerlineTracts->GetCellData()->GetArray(this->BlankingArrayName));
   vtkIntArray* centerlineIdsArray = vtkIntArray::SafeDownCast(centerlineTracts->GetCellData()->GetArray(this->CenterlineIdsArrayName));
 
-  vtkIntArray* groupIdsArray = vtkIntArray::New();
+  auto groupIdsArray = vtkSmartPointer<vtkIntArray>::New();
   groupIdsArray->SetName(this->GroupIdsArrayName);
   int numberOfCells = centerlineTracts->GetNumberOfCells();
   groupIdsArray->SetNumberOfComponents(1);
@@ -382,21 +368,21 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::PointInTubeGroupTracts(vtkPoly
 
   int i;
   for (i=0; i<numberOfCells; i++)
-    {
+  {
     groupIdsArray->SetValue(i,i);
-    }
+  }
 
   auto tube = vtkSmartPointer<vtkvmtkPolyBallLine>::New();
   tube->SetInput(centerlineTracts);
   tube->SetPolyBallRadiusArrayName(this->RadiusArrayName);
 
-  vtkIdList* tubeCellIds = vtkIdList::New();
+  auto tubeCellIds = vtkSmartPointer<vtkIdList>::New();
 
   auto centerlineTube = vtkSmartPointer<vtkvmtkPolyBallLine>::New();
   centerlineTube->SetInput(centerlineTracts);
   centerlineTube->SetPolyBallRadiusArrayName(this->RadiusArrayName);
 
-  vtkIdList* centerlineTubeCellIds = vtkIdList::New();
+  auto centerlineTubeCellIds = vtkSmartPointer<vtkIdList>::New();
 
   int numberOfCenterlineCells = input->GetNumberOfCells();
 
@@ -532,9 +518,6 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::PointInTubeGroupTracts(vtkPoly
     }
 
   centerlineTracts->GetCellData()->AddArray(groupIdsArray);
-
-  groupIdsArray->Delete();
-  tubeCellIds->Delete();
 }
 
 void vtkvmtkCenterlineSplittingAndGroupingFilter::MakeGroupIdsAdjacent(vtkPolyData* centerlineTracts)
@@ -570,7 +553,7 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::MakeTractIdsAdjacent(vtkPolyDa
   vtkIntArray* centerlineIdsArray = vtkIntArray::SafeDownCast(centerlineTracts->GetCellData()->GetArray(this->CenterlineIdsArrayName));
   vtkIntArray* tractIdsArray = vtkIntArray::SafeDownCast(centerlineTracts->GetCellData()->GetArray(this->TractIdsArrayName));
 
-  vtkIdList* centerlineIds = vtkIdList::New();
+  auto centerlineIds = vtkSmartPointer<vtkIdList>::New();
   for (int i=0; i<centerlineIdsArray->GetNumberOfTuples(); i++)
     {
     int centerlineId = centerlineIdsArray->GetValue(i);
@@ -580,7 +563,7 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::MakeTractIdsAdjacent(vtkPolyDa
   for (int i=0; i<centerlineIds->GetNumberOfIds(); i++)
     {
     int centerlineId = centerlineIds->GetId(i);
-    vtkIdList* tractIdsMap = vtkIdList::New();
+    auto tractIdsMap = vtkSmartPointer<vtkIdList>::New();
     int maxTractId = -1;
     for (int j=0; j<tractIdsArray->GetNumberOfTuples(); j++)
       {
@@ -627,9 +610,7 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::MakeTractIdsAdjacent(vtkPolyDa
       int tractId = tractIdsArray->GetValue(j);
       tractIdsArray->SetValue(j,tractIdsMap->GetId(tractId));
       }
-    tractIdsMap->Delete();
     }
-  centerlineIds->Delete();
 }
 
 void vtkvmtkCenterlineSplittingAndGroupingFilter::SplitCenterline(vtkPolyData* input, vtkIdType cellId, int numberOfSplittingPoints, const vtkIdType* subIds, const double* pcoords, const int* tractBlanking, vtkPolyData* splitCenterline)
@@ -647,20 +628,20 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::SplitCenterline(vtkPolyData* i
   int numberOfTractPoints;
 
   splitCenterline->Initialize();
-  vtkPoints* splitCenterlinePoints = vtkPoints::New();
-  vtkCellArray* splitCenterlineCellArray = vtkCellArray::New();
-  vtkIdList* splitCenterlineCellPointIds = vtkIdList::New();
+  auto splitCenterlinePoints = vtkSmartPointer<vtkPoints>::New();
+  auto splitCenterlineCellArray = vtkSmartPointer<vtkCellArray>::New();
+  auto splitCenterlineCellPointIds = vtkSmartPointer<vtkIdList>::New();
   vtkPointData* splitCenterlinePD = splitCenterline->GetPointData();
 
-  vtkIntArray* centerlineIdsArray = vtkIntArray::New();
+  auto centerlineIdsArray = vtkSmartPointer<vtkIntArray>::New();
   centerlineIdsArray->SetNumberOfComponents(1);
   centerlineIdsArray->SetName(this->CenterlineIdsArrayName);
 
-  vtkIntArray* tractIdsArray = vtkIntArray::New();
+  auto tractIdsArray = vtkSmartPointer<vtkIntArray>::New();
   tractIdsArray->SetNumberOfComponents(1);
   tractIdsArray->SetName(this->TractIdsArrayName);
 
-  vtkIntArray* blankingArray = vtkIntArray::New();
+  auto blankingArray = vtkSmartPointer<vtkIntArray>::New();
   blankingArray->SetNumberOfComponents(1);
   blankingArray->SetName(this->BlankingArrayName);
 
@@ -686,12 +667,6 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::SplitCenterline(vtkPolyData* i
     splitCenterline->GetCellData()->AddArray(centerlineIdsArray);
     splitCenterline->GetCellData()->AddArray(tractIdsArray);
     splitCenterline->GetCellData()->AddArray(blankingArray);
-
-    splitCenterlinePoints->Delete();
-    splitCenterlineCellArray->Delete();
-    splitCenterlineCellPointIds->Delete();
-    centerlineIdsArray->Delete();
-    blankingArray->Delete();
     return;
     }
 
@@ -806,12 +781,6 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::SplitCenterline(vtkPolyData* i
   splitCenterline->GetCellData()->AddArray(centerlineIdsArray);
   splitCenterline->GetCellData()->AddArray(tractIdsArray);
   splitCenterline->GetCellData()->AddArray(blankingArray);
-
-  splitCenterlinePoints->Delete();
-  splitCenterlineCellArray->Delete();
-  splitCenterlineCellPointIds->Delete();
-  centerlineIdsArray->Delete();
-  blankingArray->Delete();
 }
 
 void vtkvmtkCenterlineSplittingAndGroupingFilter::PrintSelf(ostream& os, vtkIndent indent)
