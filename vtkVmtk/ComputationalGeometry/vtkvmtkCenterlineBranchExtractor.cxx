@@ -83,7 +83,7 @@ void vtkvmtkCenterlineBranchExtractor::ComputeCenterlineSplitting(vtkPolyData* i
 
   // TODO: remove assumption: centerlines organized in a tree, parent branches as sources and children as targets
 
-  vtkvmtkPolyBallLine* tube = vtkvmtkPolyBallLine::New();
+  auto tube = vtkSmartPointer<vtkvmtkPolyBallLine>::New();
 
   tube->SetInput(input);
   tube->SetPolyBallRadiusArrayName(this->RadiusArrayName);
@@ -335,7 +335,6 @@ void vtkvmtkCenterlineBranchExtractor::ComputeCenterlineSplitting(vtkPolyData* i
     this->TractBlanking[i] = blankingFlags->GetId(i);
     }
 
-  tube->Delete();
   tubeCellIds->Delete();
 
   intersectionSubIds->Delete();

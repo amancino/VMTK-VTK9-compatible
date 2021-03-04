@@ -386,13 +386,13 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::PointInTubeGroupTracts(vtkPoly
     groupIdsArray->SetValue(i,i);
     }
 
-  vtkvmtkPolyBallLine* tube = vtkvmtkPolyBallLine::New();
+  auto tube = vtkSmartPointer<vtkvmtkPolyBallLine>::New();
   tube->SetInput(centerlineTracts);
   tube->SetPolyBallRadiusArrayName(this->RadiusArrayName);
 
   vtkIdList* tubeCellIds = vtkIdList::New();
 
-  vtkvmtkPolyBallLine* centerlineTube = vtkvmtkPolyBallLine::New();
+  auto centerlineTube = vtkSmartPointer<vtkvmtkPolyBallLine>::New();
   centerlineTube->SetInput(centerlineTracts);
   centerlineTube->SetPolyBallRadiusArrayName(this->RadiusArrayName);
 
@@ -534,7 +534,6 @@ void vtkvmtkCenterlineSplittingAndGroupingFilter::PointInTubeGroupTracts(vtkPoly
   centerlineTracts->GetCellData()->AddArray(groupIdsArray);
 
   groupIdsArray->Delete();
-  tube->Delete();
   tubeCellIds->Delete();
 }
 
