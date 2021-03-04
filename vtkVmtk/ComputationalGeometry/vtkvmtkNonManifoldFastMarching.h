@@ -154,9 +154,9 @@ class VTK_VMTK_COMPUTATIONAL_GEOMETRY_EXPORT vtkvmtkNonManifoldFastMarching : pu
   static double Min(double a, double b)    
     { return a-b < - VTK_VMTK_DOUBLE_TOL ? a : b; }
 
-  vtkDoubleArray* TScalars;
-  vtkCharArray* StatusScalars;
-  vtkvmtkMinHeap* ConsideredMinHeap;
+  vtkSmartPointer<vtkDoubleArray> TScalars;
+  vtkSmartPointer<vtkCharArray> StatusScalars;
+  vtkSmartPointer<vtkvmtkMinHeap> ConsideredMinHeap;
 
   vtkIdList* Seeds;
   vtkIdList* StopSeedId;
