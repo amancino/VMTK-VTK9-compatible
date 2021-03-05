@@ -410,6 +410,14 @@ int vtkvmtkPolyDataCenterlines::RequestData(
     }
   }
 
+  std::cout << "number of cells: " << this->GetOutput()->GetNumberOfCells() << endl;
+  std::cout << "number of points: " << this->GetOutput()->GetNumberOfPoints() << endl;
+  if (this->GetOutput()->GetNumberOfPoints() < 2)
+  {
+    throw std::exception();
+  }
+
+
   if (this->CenterlineResampling)
     {
     this->ResampleCenterlines();
