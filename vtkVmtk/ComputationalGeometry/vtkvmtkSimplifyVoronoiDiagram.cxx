@@ -34,8 +34,8 @@ vtkStandardNewMacro(vtkvmtkSimplifyVoronoiDiagram);
 
 vtkvmtkSimplifyVoronoiDiagram::vtkvmtkSimplifyVoronoiDiagram()
 {
-  this->UnremovablePointIds = NULL;
-  this->UnremovableCellIds = NULL;
+  this->UnremovablePointIds = nullptr;
+  this->UnremovableCellIds = nullptr;
   this->Simplification = VTK_VMTK_REMOVE_BOUNDARY_POINTS;
   this->IncludeUnremovable = 1;
   this->OnePassOnly = 0;
@@ -43,6 +43,17 @@ vtkvmtkSimplifyVoronoiDiagram::vtkvmtkSimplifyVoronoiDiagram()
 
 vtkvmtkSimplifyVoronoiDiagram::~vtkvmtkSimplifyVoronoiDiagram()
 {
+  if (this->UnremovableCellIds)
+  {
+    this->UnremovableCellIds->Delete();
+    this->UnremovableCellIds = nullptr;
+  }
+
+  if (this->UnremovablePointIds)
+  {
+    this->UnremovablePointIds->Delete();
+    this->UnremovablePointIds = nullptr;
+  }
 }
 
 vtkIdType vtkvmtkSimplifyVoronoiDiagram::IsBoundaryEdge(vtkCellLinks* links, vtkIdType* edge)

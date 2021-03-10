@@ -122,13 +122,13 @@ protected:
   int MergePaths;
   double MergeTolerance;
 
-  vtkSmartPointer<vtkIntArray> Edges;
-  vtkSmartPointer<vtkDoubleArray> EdgeParCoords;
+  vtkIntArray*      Edges;
+  vtkDoubleArray*   EdgeParCoords;
 
-  vtkIdList* EdgePointIds;
-  vtkSmartPointer<vtkIntArray> CellIdsArray;
-  vtkSmartPointer<vtkDoubleArray> PCoordsArray;
-  vtkDoubleArray* MinDistanceArray;
+  vtkIdList*        EdgePointIds;
+  vtkIntArray*      CellIdsArray;
+  vtkDoubleArray*   PCoordsArray;
+  vtkDoubleArray*   MinDistanceArray;
 
   vtkDataArray* LineDataArray;
 
