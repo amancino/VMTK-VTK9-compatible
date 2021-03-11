@@ -48,9 +48,9 @@ vtkCxxSetObjectMacro(vtkvmtkPolyDataCenterlines,CapCenterIds,vtkIdList);
 
 vtkvmtkPolyDataCenterlines::vtkvmtkPolyDataCenterlines()
 {
-  this->SourceSeedIds = NULL;
-  this->TargetSeedIds = NULL;
-  this->CapCenterIds = NULL;
+  this->SourceSeedIds = nullptr;
+  this->TargetSeedIds = nullptr;
+  this->CapCenterIds = nullptr;
 
   this->RadiusArrayName = NULL;
   this->CostFunction = new char[16];
@@ -77,13 +77,13 @@ vtkvmtkPolyDataCenterlines::vtkvmtkPolyDataCenterlines()
 
   this->GenerateDelaunayTessellation = 1;
 
-  this->DelaunayTessellation = NULL;
+  this->DelaunayTessellation = nullptr;
   this->DelaunayTolerance = 1E-3;
 
   this->GenerateVoronoiDiagram = 1;
   this->StopFastMarchingOnReachingTarget = 0;
-  this->VoronoiDiagram = NULL;
-  this->PoleIds = NULL;
+  this->VoronoiDiagram = nullptr;
+  this->PoleIds = nullptr;
 }
 
 vtkvmtkPolyDataCenterlines::~vtkvmtkPolyDataCenterlines()
@@ -91,19 +91,19 @@ vtkvmtkPolyDataCenterlines::~vtkvmtkPolyDataCenterlines()
   if (this->SourceSeedIds)
     {
     this->SourceSeedIds->Delete();
-    this->SourceSeedIds = NULL;
+    this->SourceSeedIds = nullptr;
     }
 
   if (this->TargetSeedIds)
     {
     this->TargetSeedIds->Delete();
-    this->TargetSeedIds = NULL;
+    this->SourceSeedIds = nullptr;
     }
 
   if (this->CapCenterIds)
     {
     this->CapCenterIds->Delete();
-    this->CapCenterIds = NULL;
+    this->CapCenterIds = nullptr;
     }
 
   if (this->CostFunction)
@@ -144,17 +144,20 @@ vtkvmtkPolyDataCenterlines::~vtkvmtkPolyDataCenterlines()
 
   if (this->DelaunayTessellation)
     {
-    this->DelaunayTessellation = NULL;
+    this->DelaunayTessellation->Delete();
+    this->DelaunayTessellation = nullptr;
     }
 
   if (this->VoronoiDiagram)
   {
-    this->VoronoiDiagram = NULL;
+    this->VoronoiDiagram->Delete();
+    this->VoronoiDiagram = nullptr;
   }
 
   if (this->PoleIds)
   {
-    this->PoleIds = NULL;
+    this->PoleIds->Delete();
+    this->PoleIds = nullptr;
   }
 
 }
@@ -267,7 +270,7 @@ int vtkvmtkPolyDataCenterlines::RequestData(
     voronoiDiagramFilter->SetRadiusArrayName(this->RadiusArrayName);
     voronoiDiagramFilter->Update();
 
-    this->PoleIds = vtkSmartPointer<vtkIdList>::New();
+    this->PoleIds = vtkIdList::New();
     this->PoleIds->DeepCopy(voronoiDiagramFilter->GetPoleIds());
 
     vtkPolyData* voronoiDiagram = voronoiDiagramFilter->GetOutput();
@@ -285,7 +288,7 @@ int vtkvmtkPolyDataCenterlines::RequestData(
       voronoiDiagram = voronoiDiagramSimplifier->GetOutput();
       voronoiDiagram->Register(this);
     }
-    this->VoronoiDiagram = vtkSmartPointer<vtkPolyData>::New();
+    this->VoronoiDiagram = vtkPolyData::New();
     this->VoronoiDiagram->DeepCopy(voronoiDiagram);
   }
 

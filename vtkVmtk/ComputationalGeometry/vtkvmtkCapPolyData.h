@@ -77,7 +77,7 @@ class VTK_VMTK_COMPUTATIONAL_GEOMETRY_EXPORT vtkvmtkCapPolyData : public vtkPoly
 
   double Displacement;
   double InPlaneDisplacement;
-  vtkSmartPointer<vtkIdList> CapCenterIds;
+  vtkIdList* CapCenterIds;
 
   private:
   vtkvmtkCapPolyData(const vtkvmtkCapPolyData&);  // Not implemented.

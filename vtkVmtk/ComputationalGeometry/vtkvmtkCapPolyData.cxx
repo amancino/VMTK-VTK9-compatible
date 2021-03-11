@@ -52,12 +52,14 @@ vtkvmtkCapPolyData::~vtkvmtkCapPolyData()
 {
   if (this->BoundaryIds)
   {
+    this->BoundaryIds->Delete();
     this->BoundaryIds = nullptr;
   }
   if (this->CapCenterIds)
-    {
+  {
+    this->CapCenterIds->Delete();
     this->CapCenterIds = nullptr;
-    }
+  }
   if (this->CellEntityIdsArrayName)
     {
     delete[] this->CellEntityIdsArrayName;
@@ -129,10 +131,11 @@ int vtkvmtkCapPolyData::RequestData(
 
   if (this->CapCenterIds)
   {
+    this->CapCenterIds->Delete();
     this->CapCenterIds = NULL;
   }
 
-  this->CapCenterIds = vtkSmartPointer<vtkIdList>::New();
+  this->CapCenterIds = vtkIdList::New();
   this->CapCenterIds->SetNumberOfIds(boundaries->GetNumberOfCells());
   for (i=0; i<this->CapCenterIds->GetNumberOfIds(); i++)
   {
