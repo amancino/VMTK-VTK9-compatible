@@ -37,12 +37,17 @@ vtkStandardNewMacro(vtkvmtkVoronoiDiagram3D);
 vtkvmtkVoronoiDiagram3D::vtkvmtkVoronoiDiagram3D()
 {
   this->BuildLines = 0;
-  this->PoleIds = vtkSmartPointer<vtkIdList>::New();
+  this->PoleIds = vtkIdList::New();
   this->RadiusArrayName = NULL;
 }
 
 vtkvmtkVoronoiDiagram3D::~vtkvmtkVoronoiDiagram3D()
 {
+  if (this->PoleIds)
+  {
+    this->PoleIds->Delete();
+    this->PoleIds = nullptr;
+  }
   if (this->RadiusArrayName)
     {
     delete[] this->RadiusArrayName;
@@ -185,7 +190,6 @@ int vtkvmtkVoronoiDiagram3D::RequestData(
   double currentRadius;
   vtkIdType i, j, id, poleId;
 
-  vtkDoubleArray* thicknessScalars;
   vtkTetra* tetra;
 
   poleId = -1;
@@ -197,7 +201,7 @@ int vtkvmtkVoronoiDiagram3D::RequestData(
   newScalars->SetNumberOfTuples(input->GetNumberOfCells());
   auto newPolys = vtkSmartPointer<vtkCellArray>::New();
   auto newLines = vtkSmartPointer<vtkCellArray>::New();
-  thicknessScalars = vtkDoubleArray::New();
+  auto thicknessScalars = vtkSmartPointer<vtkDoubleArray>::New();
   thicknessScalars->SetNumberOfTuples(input->GetNumberOfPoints());
   thicknessScalars->FillComponent(0,0.0);
 
@@ -214,7 +218,7 @@ int vtkvmtkVoronoiDiagram3D::RequestData(
 
   for (i=0; i<input->GetNumberOfCells(); i++)
     {
-    tetra = (vtkTetra*) input->GetCell(i);
+    tetra = static_cast<vtkTetra*>(input->GetCell(i));
     tetra->GetPoints()->GetPoint(0,p0);
     tetra->GetPoints()->GetPoint(1,p1);
     tetra->GetPoints()->GetPoint(2,p2);

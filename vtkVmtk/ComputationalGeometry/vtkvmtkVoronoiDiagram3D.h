@@ -67,7 +67,7 @@ class VTK_VMTK_COMPUTATIONAL_GEOMETRY_EXPORT vtkvmtkVoronoiDiagram3D : public vt
   void BuildVoronoiLines() {};   // not yet implemented
 
   int BuildLines;
-  vtkSmartPointer<vtkIdList> PoleIds;
+  vtkIdList* PoleIds;
   char* RadiusArrayName;
 
   private:
